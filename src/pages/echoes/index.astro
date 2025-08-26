@@ -2,7 +2,7 @@
 // import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseHead from '@/components/BaseHead.astro';
-import ScreenGlow from '@/components/ScreenGlow.astro';
+// import ScreenGlow from '@/components/ScreenGlow.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
@@ -20,7 +20,7 @@ const posts = (await getCollection('blog')).sort(
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-		<ScreenGlow />
+		<!-- <ScreenGlow /> -->
 		<Header />
 		<main>
 				<ol id="echoes-list">
@@ -28,13 +28,10 @@ const posts = (await getCollection('blog')).sort(
 						posts.map((post) => (
 							<li>
 								<a href={`/echoes/${post.id}/`}>
-									{/* {post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)} */}
 									<h2>{post.data.title}</h2>
-									<p class="date">
+									<span >
 										<FormattedDate date={post.data.pubDate} />
-									</p>
+									</span>
 								</a>
 							</li>
 						))

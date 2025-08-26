@@ -7,13 +7,16 @@
 }
 :root {
   --siteMaxWidth: 1200px;
-  --sitePadding: 2rem;
+  --sitePadding: 2.4rem;
 
   --fontCore: "JetBrains Mono", Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
 
   --clrPrimary: oklch(0.6559 0.2328 34.52);
   --clrText: oklch(1 0 0);
-  --clrBg: oklch(from var(--clrPrimary) 0.03 c h);
+  --clrDetail: oklch(0.49 0 none);
+  --clrBg: oklch(0.1448 0 0);
+  --clrCardBg: oklch(0.2099 0.0039 286.06);
+  --clrBorder: oklch(0.257 0.0037 286.14);
 }
 html {
   font-family: var(--fontCore);
@@ -21,6 +24,7 @@ html {
   color: var(--clrText);
   background-color: var(--clrBg);
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -34,12 +38,16 @@ body {
   font-size: 1.6rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  text-shadow:
-    0 0 0.1rem var(--clrPrimary),
-    0 0 0.5rem var(--clrPrimary),
-    0 0 2rem var(--clrPrimary);
+  padding-top: 9.2rem;
 }
-body::after {
+/* #screen-glow {
+  position: fixed;
+  inset: 0;
+  box-shadow: inset 0 0 2ch oklch(from var(--clrPrimary) l c h / 0.3);
+  pointer-events: none;
+  z-index: 10001;
+} */
+/* body::after {
   content: "";
   position: fixed;
   inset: 0;
@@ -49,23 +57,24 @@ body::after {
   z-index: 10000;
   pointer-events: none;
 }
-#screen-glow {
-  position: fixed;
-  inset: 0;
-  box-shadow: inset 0 0 2ch oklch(from var(--clrPrimary) l c h / 0.3);
-  pointer-events: none;
-  z-index: 10001;
-}
 @keyframes scanlines {
   0% {
     background-position: 0 0.4rem;
   }
-}
+} */
 #nav-wrapper {
   flex-shrink: 0;
-  padding: var(--sitePadding);
+  position: fixed;
+  top: var(--sitePadding);
+  transform: translateX(-50%);
+  left: 50%;
+  padding: 1.2rem var(--sitePadding);
+  width: auto;
+  background-color: var(--clrCardBg);
+  border: 1px solid var(--clrBorder);
   text-transform: uppercase;
   text-align: center;
+  z-index: 100;
 }
 nav {
   display: flex;
@@ -90,6 +99,7 @@ main {
   max-width: var(--siteMaxWidth);
   margin: 0 auto;
   padding: var(--sitePadding);
+  border: 1px solid var(--clrBorder);
   line-height: 1.6;
 }
 footer {
@@ -130,36 +140,20 @@ a {
 }
 table {
   width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--clrBorder);
+}
+th,
+td {
+  border: 1px solid var(--clrBorder);
 }
 img {
   display: block;
   max-width: 100%;
 }
-code {
-  padding: 0.2rem 0.5rem;
-  border: 1px solid var(--clrPrimary);
-}
-pre {
-  padding: 1.5em;
-}
-pre > code {
-  all: unset;
-}
-blockquote {
-  border-left: 4px solid var(--clrText);
-  padding-left: 2rem;
-  font-size: 1.3em;
-}
 hr {
   border: none;
-  border-top: 1px solid var(--clrText);
-  box-shadow:
-    0 0 0.1rem var(--clrPrimary),
-    0 0 0.5rem var(--clrPrimary),
-    0 0 2rem var(--clrPrimary);
-}
-mark {
-  background-color: var(--clrPrimary);
+  border-top: 1px solid var(--clrBorder);
 }
 /**/
 /* UTILITIES */
@@ -184,6 +178,17 @@ mark {
   font-style: italic;
 }
 /**/
+/* INDEX PAGE */
+#index-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#index-main pre {
+  font-size: clamp(0.4rem, 1vw, 1.2rem);
+}
+/**/
 /* ECHOES PAGE */
 #echoes-list {
   list-style: none;
@@ -205,30 +210,45 @@ mark {
 }
 .date {
   display: block;
+  color: var(--clrDetail);
   margin-bottom: 2rem;
 }
-.prose h2 {
+.prose > *:not(:last-child) {
+  margin-bottom: 2em;
+}
+.prose > h2:not(:last-child) {
   margin-bottom: 1em;
 }
-.prose h3,
-.prose h4,
-.prose h5,
-.prose h6 {
+.prose > h3:not(:last-child),
+.prose > h4:not(:last-child),
+.prose > h5:not(:last-child),
+.prose > h6:not(:last-child) {
   margin-bottom: 1.33em;
-}
-.prose p {
-  margin-bottom: 2em;
 }
 .prose blockquote,
 .prose pre {
-  margin-bottom: 1em;
+  padding: 2rem;
+  background-color: var(--clrCardBg) !important;
+}
+.prose pre > code {
+  all: unset;
+}
+.prose code {
+  padding: 0.2rem 0.5rem;
+  background-color: var(--clrCardBg);
+}
+.prose blockquote {
+  border-left: 0.4rem solid var(--clrText);
 }
 .prose ul,
 .prose ol {
   list-style-position: inside;
-  margin-bottom: 2em;
 }
 .prose li ul,
 .prose li ol {
   margin-left: 1em;
+}
+.prose mark {
+  color: var(--clrBg);
+  background-color: var(--clrText);
 }

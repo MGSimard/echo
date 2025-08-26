@@ -1,6 +1,6 @@
 ---
 import BaseHead from '@/components/BaseHead.astro';
-import ScreenGlow from '@/components/ScreenGlow.astro';
+// import ScreenGlow from '@/components/ScreenGlow.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts';
@@ -12,19 +12,18 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts';
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-		<ScreenGlow />
+		<!-- <ScreenGlow /> -->
 		<Header />
-		<main>
+		<main id="index-main">
 			<h1 class="sr-only">DEVOID</h1>
-			<pre id="index-pre" aria-hidden="true">
-				████████▄     ▄████████  ▄█    █▄   ▄██████▄   ▄█  ████████▄
-				███   ▀███   ███    ███ ███    ███ ███    ███ ███  ███   ▀███
-				███    ███   ███    █▀  ███    ███ ███    ███ ███▌ ███    ███
-				███    ███  ▄███▄▄▄     ███    ███ ███    ███ ███▌ ███    ███
-				███    ███ ▀▀███▀▀▀     ███    ███ ███    ███ ███▌ ███    ███
-				███    ███   ███    █▄  ███    ███ ███    ███ ███  ███    ███
-				███   ▄███   ███    ███ ███    ███ ███    ███ ███  ███   ▄███
-				████████▀    ██████████  ▀██████▀   ▀██████▀  █▀   ████████▀
+			<pre aria-hidden="true">████████▄     ▄████████  ▄█    █▄   ▄██████▄   ▄█  ████████▄
+███   ▀███   ███    ███ ███    ███ ███    ███ ███  ███   ▀███
+███    ███   ███    █▀  ███    ███ ███    ███ ███▌ ███    ███
+███    ███  ▄███▄▄▄     ███    ███ ███    ███ ███▌ ███    ███
+███    ███ ▀▀███▀▀▀     ███    ███ ███    ███ ███▌ ███    ███
+███    ███   ███    █▄  ███    ███ ███    ███ ███  ███    ███
+███   ▄███   ███    ███ ███    ███ ███    ███ ███  ███   ▄███
+████████▀    ██████████  ▀██████▀   ▀██████▀  █▀   ████████▀
 			</pre>
 		</main>
 		<Footer />
