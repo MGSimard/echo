@@ -26,9 +26,16 @@ html {
   font-size: 62.5%;
 }
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   font-size: 1.6rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+header {
+  flex-shrink: 0;
+  padding: 0 var(--sitePadding);
 }
 nav {
   display: flex;
@@ -46,10 +53,15 @@ nav a {
 nav a.active {
 }
 main {
+  flex-grow: 1;
   width: 100%;
   max-width: var(--siteMaxWidth);
   margin: 0 auto;
   padding: var(--sitePadding);
+}
+footer {
+  flex-shrink: 0;
+  padding: 2rem var(--sitePadding) 4rem var(--sitePadding);
 }
 h1,
 h2,
