@@ -155,10 +155,8 @@ hr {
   border-top: 1px solid var(--clrText);
   box-shadow:
     0 0 0.1rem var(--clrPrimary),
-    0 0 0.25rem var(--clrPrimary),
     0 0 0.5rem var(--clrPrimary),
-    0 0 1rem var(--clrPrimary),
-    0 0 2.5rem var(--clrPrimary);
+    0 0 2rem var(--clrPrimary);
 }
 mark {
   background-color: var(--clrPrimary);
