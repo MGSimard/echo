@@ -11,6 +11,7 @@ export default tseslint.config(
   eslintConfigPrettier,
   eslintPluginAstro.configs.recommended,
   {
+    files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: "latest",
@@ -18,6 +19,7 @@ export default tseslint.config(
       parserOptions: {
         project: "./tsconfig.json",
         tsconfigRootDir: import.meta.dirname,
+        extraFileExtensions: [".astro"],
       },
     },
     rules: {
