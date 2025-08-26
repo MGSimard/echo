@@ -1,17 +1,15 @@
 ---
-import { SITE_TITLE } from '@/consts';
 import HeaderLink from '@/components/HeaderLink.astro';
 ---
 
 <header>
 	<nav>
-		<h2><a href="/">{SITE_TITLE}</a></h2>
 		<ul>
 			<li>
-				<HeaderLink href="/">Home</HeaderLink>
+				<HeaderLink href="/" aria-label="Home">LOGO</HeaderLink>
 			</li>
 			<li>
-				<HeaderLink href="/blog">Echo</HeaderLink>
+				<HeaderLink href="/echoes">Echoes</HeaderLink>
 			</li>
 		</ul>
 	</nav>

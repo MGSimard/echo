@@ -36,6 +36,8 @@ nav {
   align-items: center;
 }
 nav ul {
+  display: flex;
+  gap: 1em;
   list-style: none;
 }
 nav a {
@@ -154,20 +156,12 @@ hr {
 .prose p {
   margin-bottom: 2em;
 }
-.title {
-  margin-bottom: 1em;
-  padding: 1em 0;
-  text-align: center;
-  line-height: 1;
-}
-.title h1 {
-  margin: 0 0 0.5em 0;
-}
-.date {
-  margin-bottom: 0.5em;
-  color: rgb(var(--gray));
-}
 .last-updated-on {
   font-style: italic;
+}
+/**/
+/* ECHOES PAGE */
+#echoes-list {
+  list-style: none;
 }
 /**/
