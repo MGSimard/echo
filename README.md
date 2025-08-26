@@ -1,22 +1,8 @@
-# Echo
+# Astro App
 
-Storing blog posts in a database should be outlawed
+## Task List
 
-## CORE
-
-- MDX + Frontmatter
-- SSG (Prerender @ build)
-
-## Options
-
-- Astro
-- Nextjs (SSG)
-- TanStack Start (SPA Mode)
-
-## Goals
-
-- No wasteful DB usage
-- Create posts using MDX + Frontmatter from IDE or repo directly
+- [ ] Update final deployment URL in astro.config.mjs
 
 ---
 
@@ -58,7 +44,7 @@ Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page
 
 There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/echo/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
 
 Any static assets, like images, can be placed in the `public/` directory.
 
