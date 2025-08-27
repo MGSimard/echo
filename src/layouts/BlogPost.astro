@@ -10,7 +10,12 @@ import type { MarkdownHeading } from "astro";
 type Props = CollectionEntry<"blog">["data"] & { headings: MarkdownHeading[] };
 
 const { title, description, pubDate, updatedDate, heroImage, headings } = Astro.props as Props;
-const filteredHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const filteredHeadings = headings.filter((heading) => {
+  const isDesiredDepth = heading.depth === 2 || heading.depth === 3;
+  const isFootnotes =
+    /footnotes?/i.test(heading.text) || heading.slug === "footnotes" || heading.slug === "footnote-label";
+  return isDesiredDepth && !isFootnotes;
+});
 
 // Hierarchical TOC structure with h2 & nested h3 headings
 const tocHeadings: (MarkdownHeading & { children: MarkdownHeading[] })[] = [];
@@ -85,5 +90,147 @@ for (const heading of filteredHeadings) {
       </aside>
     </main>
     <Footer />
+    <script>
+      const tocEl = document.getElementById("toc") as HTMLElement | null;
+      if (tocEl) {
+        const headings = Array.from(document.querySelectorAll(".prose h2[id], .prose h3[id]")) as HTMLElement[];
+        const isNotFootnotes = (el: HTMLElement) => el.id !== "footnote-label" && !el.closest(".footnotes");
+        const observedHeadings: HTMLElement[] = headings.filter((h) => !!h.id && isNotFootnotes(h));
+        const FOCUS_OFFSET_PX = 160; // adjust as desired
+        const DEBUG_TOC = true; // set to false to hide overlay
+        const H2_MIN_VISIBLE_RATIO = 0.25; // how much of an H2 must be inside the window
+        const H3_MIN_VISIBLE_RATIO = 0.12; // how much of an H3 must be inside the window
+
+        // Debug overlay to visualize the detection window
+        if (DEBUG_TOC) {
+          const overlay = document.createElement("div");
+          overlay.id = "toc-debug-overlay";
+          Object.assign(overlay.style, {
+            position: "fixed",
+            inset: "0",
+            pointerEvents: "none",
+            zIndex: "1000",
+          } as CSSStyleDeclaration);
+
+          const topLine = document.createElement("div");
+          Object.assign(topLine.style, {
+            position: "absolute",
+            top: `${FOCUS_OFFSET_PX}px`,
+            left: "0",
+            right: "0",
+            height: "0",
+            borderTop: "1px dashed rgba(255,255,255,0.5)",
+          } as CSSStyleDeclaration);
+
+          const bottomLine = document.createElement("div");
+          Object.assign(bottomLine.style, {
+            position: "absolute",
+            bottom: `${FOCUS_OFFSET_PX}px`,
+            left: "0",
+            right: "0",
+            height: "0",
+            borderTop: "1px dashed rgba(255,255,255,0.5)",
+          } as CSSStyleDeclaration);
+
+          overlay.appendChild(topLine);
+          overlay.appendChild(bottomLine);
+          document.body.appendChild(overlay);
+        }
+
+        // Map heading id -> corresponding TOC link
+        const idToLink = new Map<string, HTMLElement>();
+        observedHeadings.forEach((h) => {
+          const a = (tocEl as HTMLElement).querySelector<HTMLElement>(`a[href="#${h.id}"]`);
+          if (a) idToLink.set(h.id, a);
+        });
+
+        // Ensure no link is pre-marked via hash; IntersectionObserver governs highlighting exclusively
+        (tocEl as HTMLElement).querySelectorAll("a.observed").forEach((a) => a.classList.remove("observed"));
+        (tocEl as HTMLElement).querySelectorAll("li.observed").forEach((li) => li.classList.remove("observed"));
+
+        function clearHashObserved() {
+          const hashId = (location.hash || "").slice(1);
+          if (!hashId) return;
+          const link = idToLink.get(hashId);
+          if (link) {
+            link.classList.remove("observed");
+            const li = link.closest("li");
+            if (li) li.classList.remove("observed");
+          }
+        }
+        window.addEventListener("hashchange", clearHashObserved, { passive: true } as AddEventListenerOptions);
+        clearHashObserved();
+
+        // Track H2/H3 relationships so that a visible H3 also marks its parent H2 as observed
+        const h3ToParentH2Id = new Map<string, string>();
+        let lastH2Id: string | null = null;
+        for (const el of observedHeadings) {
+          if (el.tagName === "H2") lastH2Id = el.id;
+          if (el.tagName === "H3" && lastH2Id) h3ToParentH2Id.set(el.id, lastH2Id);
+        }
+
+        const activeH2Ids = new Set<string>();
+        const activeH3Ids = new Set<string>();
+
+        function applyObservedClasses() {
+          // Clear all
+          (tocEl as HTMLElement).querySelectorAll("a.observed").forEach((a) => a.classList.remove("observed"));
+          (tocEl as HTMLElement).querySelectorAll("li.observed").forEach((li) => li.classList.remove("observed"));
+
+          // Apply H3 observed
+          activeH3Ids.forEach((id) => {
+            const link = idToLink.get(id);
+            if (!link) return;
+            link.classList.add("observed");
+            const li = link.closest("li");
+            if (li) li.classList.add("observed");
+          });
+
+          // Apply H2 observed: visible H2 or parents of visible H3
+          const toHighlightH2 = new Set<string>(activeH2Ids);
+          activeH3Ids.forEach((h3id) => {
+            const parentId = h3ToParentH2Id.get(h3id);
+            if (parentId) toHighlightH2.add(parentId);
+          });
+          toHighlightH2.forEach((id) => {
+            const link = idToLink.get(id);
+            if (!link) return;
+            link.classList.add("observed");
+            const li = link.closest("li");
+            if (li) li.classList.add("observed");
+          });
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              const el = entry.target as HTMLElement;
+              const id = el.id;
+              const isH2 = el.tagName === "H2";
+              const isH3 = el.tagName === "H3";
+              const ratio = entry.intersectionRatio;
+              const h2Intersecting = entry.isIntersecting && ratio >= H2_MIN_VISIBLE_RATIO;
+              const h3Intersecting = entry.isIntersecting && ratio >= H3_MIN_VISIBLE_RATIO;
+
+              if (isH2) {
+                if (h2Intersecting) activeH2Ids.add(id);
+                else activeH2Ids.delete(id);
+              } else if (isH3) {
+                if (h3Intersecting) activeH3Ids.add(id);
+                else activeH3Ids.delete(id);
+              }
+            }
+            applyObservedClasses();
+          },
+          {
+            root: null,
+            rootMargin: `-${FOCUS_OFFSET_PX}px 0px -${FOCUS_OFFSET_PX}px 0px`,
+            threshold: [0, H3_MIN_VISIBLE_RATIO, H2_MIN_VISIBLE_RATIO],
+          }
+        );
+
+        observedHeadings.forEach((h) => observer.observe(h));
+      }
+    </script>
   </body>
 </html>

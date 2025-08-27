@@ -228,6 +228,9 @@ hr {
 .prose > *:not(:last-child) {
   margin-bottom: 2em;
 }
+.prose > * {
+  display: block;
+}
 .prose > h2:not(:last-child) {
   margin-bottom: 1em;
 }
@@ -236,6 +239,11 @@ hr {
 .prose > h5:not(:last-child),
 .prose > h6:not(:last-child) {
   margin-bottom: 1.33em;
+}
+/* Ensure anchored headings don't stick to the very top; honor site padding */
+.prose h2,
+.prose h3 {
+  scroll-margin-top: calc(var(--sitePadding) * 3);
 }
 .prose blockquote,
 .prose pre {
@@ -267,9 +275,11 @@ hr {
 #toc {
   position: sticky;
   top: var(--sitePadding);
-  max-width: 30rem;
+  max-width: 24rem;
   background-color: var(--clrCardBg);
-  padding: 1rem;
+  padding: 1.2rem 2.4rem;
+  font-weight: 100;
+  color: var(--clrDetail);
   border: 1px solid var(--clrBorder);
 }
 #toc ol {
@@ -278,3 +288,38 @@ hr {
 #toc li > ol {
   margin-left: 1em;
 }
+#toc a {
+  position: relative;
+  text-decoration: none;
+}
+/* H2 TOC */
+#toc > ol > li > a {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+}
+#toc > ol > li > a.observed {
+  color: var(--clrPrimary);
+}
+#toc > ol > li > a.observed::before {
+  content: "▸";
+  position: absolute;
+  left: -1em;
+  top: 0;
+  color: var(--clrPrimary);
+  pointer-events: none;
+}
+/* H3 TOC */
+#toc li li {
+  font-size: 1.4rem;
+}
+#toc li li a.observed {
+  color: var(--clrPrimary);
+}
+/* #toc li li a.observed::before {
+  content: "▹";
+  position: absolute;
+  left: -1em;
+  top: 0;
+  color: var(--clrPrimary);
+  pointer-events: none;
+} */
