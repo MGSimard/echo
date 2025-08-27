@@ -330,6 +330,24 @@ hr {
   font-weight: 200;
   color: var(--clrDetail);
   border: 1px solid var(--clrBorder);
+  /* Prevent overflow and enable scrolling within the ToC */
+  max-height: calc(100dvh - (var(--sitePadding) * 2));
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Thin scrollbar (Firefox) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--clrDetail) transparent;
+}
+#toc::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+#toc::-webkit-scrollbar-track {
+  background: transparent;
+}
+#toc::-webkit-scrollbar-thumb {
+  background-color: var(--clrDetail);
+  border-radius: 8px;
 }
 #toc ol {
   list-style: none;
