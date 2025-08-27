@@ -95,7 +95,6 @@ for (const heading of filteredHeadings) {
       if (tocEl) {
         const FOCUS_OFFSET_TOP_PX = 72; // px: compensate fixed navbar + desired focus band
         const FOCUS_OFFSET_BOTTOM_PX = 256; // px: size of bottom exclusion zone
-        const DEBUG_TOC = true; // keep debug overlay visible
 
         // State
         let observedHeadings: HTMLElement[] = [];
@@ -105,43 +104,6 @@ for (const heading of filteredHeadings) {
         const activeH3Ids = new Set<string>();
         let observer: IntersectionObserver | null = null;
         let fallbackH2Id: string | null = null; // computed when no H2 intersects
-
-        function ensureDebugOverlay() {
-          if (!DEBUG_TOC) return;
-          if (document.getElementById("toc-debug-overlay")) return;
-          const overlay = document.createElement("div");
-          overlay.id = "toc-debug-overlay";
-          Object.assign(overlay.style, {
-            position: "fixed",
-            inset: "0",
-            pointerEvents: "none",
-            zIndex: "1000",
-          } as CSSStyleDeclaration);
-
-          const topLine = document.createElement("div");
-          Object.assign(topLine.style, {
-            position: "absolute",
-            top: `${FOCUS_OFFSET_TOP_PX}px`,
-            left: "0",
-            right: "0",
-            height: "0",
-            borderTop: "1px dashed rgba(255,255,255,0.5)",
-          } as CSSStyleDeclaration);
-
-          const bottomLine = document.createElement("div");
-          Object.assign(bottomLine.style, {
-            position: "absolute",
-            bottom: `${FOCUS_OFFSET_BOTTOM_PX}px`,
-            left: "0",
-            right: "0",
-            height: "0",
-            borderTop: "1px dashed rgba(255,255,255,0.5)",
-          } as CSSStyleDeclaration);
-
-          overlay.appendChild(topLine);
-          overlay.appendChild(bottomLine);
-          document.body.appendChild(overlay);
-        }
 
         function mapIdToLink() {
           idToLink.clear();
@@ -290,8 +252,6 @@ for (const heading of filteredHeadings) {
         }
 
         function initTOC() {
-          ensureDebugOverlay();
-
           const headings = Array.from(document.querySelectorAll(".prose h2[id], .prose h3[id]")) as HTMLElement[];
           const isNotFootnotes = (el: HTMLElement) => el.id !== "footnote-label" && !el.closest(".footnotes");
           observedHeadings = headings.filter((h) => !!h.id && isNotFootnotes(h));
