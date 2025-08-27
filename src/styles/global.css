@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* outline: 1px solid red; */
+  /* outline: 1px solid rgba(255, 0, 0, 0.1); */
 }
 :root {
   --contentMaxWidth: 768px;
@@ -34,16 +34,18 @@ html {
 body {
   display: flex;
   flex-direction: column;
+  gap: 1.6rem;
   min-height: 100dvh;
   font-size: 1.6rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
   padding-top: 9.2rem;
+  padding-inline: var(--sitePadding);
 }
 /* #screen-glow {
   position: fixed;
   inset: 0;
-  box-shadow: inset 0 0 2ch oklch(from var(--clrPrimary) l c h / 0.3);
+  box-shadow: inset 0 0 5vw oklch(1 0 none / 0.1);
   pointer-events: none;
   z-index: 10001;
 } */
@@ -70,7 +72,7 @@ body {
   left: 50%;
   padding: 1.2rem 2.4rem;
   width: auto;
-  max-width: min(var(--contentMaxWidth), calc(100vw - (var(--sitePadding) * 2)));
+  max-width: min(var(--contentMaxWidth), calc(100% - (var(--sitePadding) * 2)));
   background-color: var(--clrCardBg);
   border: 1px solid var(--clrBorder);
   text-transform: uppercase;
@@ -116,7 +118,6 @@ main {
   gap: 1.6rem;
   width: 100%;
   margin: 0 auto;
-  padding: var(--sitePadding);
   line-height: 1.6;
 }
 main > *:not(.gutter) {
@@ -135,10 +136,15 @@ main > *:not(.gutter) {
 }
 footer {
   flex-shrink: 0;
+  width: 100%;
+  max-width: var(--contentMaxWidth);
+  margin: 0 auto;
   padding: 8rem var(--sitePadding) 12rem var(--sitePadding);
   text-align: center;
   color: var(--clrDetail);
   border-top: 1px solid var(--clrBorder);
+  border-right: 1px solid var(--clrBorder);
+  border-left: 1px solid var(--clrBorder);
 }
 h1,
 h2,
@@ -225,6 +231,28 @@ hr {
 /* ECHOES PAGE */
 #echoes-list {
   list-style: none;
+}
+#echoes-list a {
+  text-decoration: none;
+}
+#echoes-list span {
+  font-size: 1.2rem;
+  color: var(--clrDetail);
+}
+#echoes-list h2 {
+  font-size: 1.6rem;
+}
+#echoes-list li:not(:last-child) {
+  margin-bottom: 1.6rem;
+}
+#echoes-list li a {
+  display: block;
+  padding: 0.6rem 1.2rem;
+  border-left: 0.4rem solid var(--clrBorder);
+}
+#echoes-list li a:hover,
+#echoes-list li a:focus-visible {
+  border-color: var(--clrText);
 }
 /**/
 /* ARTICLE STYLES */

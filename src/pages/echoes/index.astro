@@ -22,15 +22,16 @@ const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueO
     <Header />
     <main>
       <div class="gutter" aria-hidden="true"><!-- Fill Gutter --></div>
+      <h1 class="sr-only">Echoes</h1>
       <ol id="echoes-list">
         {
           posts.map((post) => (
             <li>
               <a href={`/echoes/${post.id}/`}>
-                <h2>{post.data.title}</h2>
                 <span>
                   <FormattedDate date={post.data.pubDate} />
                 </span>
+                <h2>{post.data.title}</h2>
               </a>
             </li>
           ))

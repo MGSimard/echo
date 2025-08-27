@@ -5,7 +5,7 @@ import Footer from "@/components/Footer.astro";
 import FormattedDate from "@/components/FormattedDate.astro";
 import Header from "@/components/Header.astro";
 import type { MarkdownHeading } from "astro";
-// import ScreenGlow from '@/components/ScreenGlow.astro';
+// import ScreenGlow from "@/components/ScreenGlow.astro";
 
 type Props = CollectionEntry<"blog">["data"] & { headings: MarkdownHeading[] };
 
@@ -95,17 +95,16 @@ for (const heading of filteredHeadings) {
     <script>
       const tocEl = document.getElementById("toc") as HTMLElement | null;
       if (tocEl) {
-        const FOCUS_OFFSET_TOP_PX = 72; // px: compensate fixed navbar + desired focus band
-        const FOCUS_OFFSET_BOTTOM_PX = 256; // px: size of bottom exclusion zone
+        const FOCUS_OFFSET_TOP_PX = 72;
+        const FOCUS_OFFSET_BOTTOM_PX = 256;
 
-        // State
         let observedHeadings: HTMLElement[] = [];
         const idToLink = new Map<string, HTMLElement>();
         const h3ToParentH2Id = new Map<string, string>();
         const activeH2Ids = new Set<string>();
         const activeH3Ids = new Set<string>();
         let observer: IntersectionObserver | null = null;
-        let fallbackH2Id: string | null = null; // computed when no H2 intersects
+        let fallbackH2Id: string | null = null;
 
         function mapIdToLink() {
           idToLink.clear();
@@ -114,8 +113,6 @@ for (const heading of filteredHeadings) {
             if (a) idToLink.set(h.id, a);
           });
         }
-
-        // No hash-based highlighting; IntersectionObserver governs state.
 
         function buildHeadingRelations() {
           h3ToParentH2Id.clear();
@@ -127,14 +124,12 @@ for (const heading of filteredHeadings) {
         }
 
         function applyObservedClasses() {
-          // Clear all
           (tocEl as HTMLElement).querySelectorAll("a.observed").forEach((a) => a.classList.remove("observed"));
           (tocEl as HTMLElement).querySelectorAll("li.observed").forEach((li) => li.classList.remove("observed"));
           (tocEl as HTMLElement)
             .querySelectorAll('a[aria-current="true"]')
             .forEach((a) => a.removeAttribute("aria-current"));
 
-          // Apply H3 observed
           activeH3Ids.forEach((id) => {
             const link = idToLink.get(id);
             if (!link) return;
@@ -144,7 +139,6 @@ for (const heading of filteredHeadings) {
             if (li) li.classList.add("observed");
           });
 
-          // Apply H2 observed: visible H2 or parents of visible H3
           const toHighlightH2 = new Set<string>(activeH2Ids);
           if (fallbackH2Id) toHighlightH2.add(fallbackH2Id);
           activeH3Ids.forEach((h3id) => {
@@ -161,11 +155,9 @@ for (const heading of filteredHeadings) {
           });
         }
 
-        // Compute fallback H2 id for the current section when no H2 intersects
-        // the focus band. This avoids a sticky previous section.
         function computeFallbackH2Id() {
           fallbackH2Id = null;
-          if (activeH2Ids.size > 0) return; // real intersection wins
+          if (activeH2Ids.size > 0) return;
           const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
           const topPx = FOCUS_OFFSET_TOP_PX;
           const bottomPx = FOCUS_OFFSET_BOTTOM_PX;
@@ -179,13 +171,11 @@ for (const heading of filteredHeadings) {
             const next = i + 1 < h2s.length ? h2s[i + 1] : null;
             const curTop = cur.getBoundingClientRect().top;
             const nextTop = next ? next.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
-            // last H2 above the focusTop while the next H2 hasn't started
             if (curTop <= focusTop && nextTop > focusTop) {
               fallbackH2Id = cur.id;
               return;
             }
           }
-          // Fallback: any H2 whose box intersects the focus band
           for (const cur of h2s) {
             const rect = cur.getBoundingClientRect();
             if (rect.bottom > focusTop && rect.top < focusBottom) {
@@ -261,7 +251,6 @@ for (const heading of filteredHeadings) {
           mapIdToLink();
           buildHeadingRelations();
 
-          // Clear any previous state before we attach observers
           (tocEl as HTMLElement).querySelectorAll("a.observed").forEach((a) => a.classList.remove("observed"));
           (tocEl as HTMLElement).querySelectorAll("li.observed").forEach((li) => li.classList.remove("observed"));
           (tocEl as HTMLElement)
@@ -274,8 +263,7 @@ for (const heading of filteredHeadings) {
         }
 
         initTOC();
-        // Proactively recompute fallback highlight during scrolling/resizing so
-        // a previously chosen section does not remain sticky.
+
         let rafScheduled = false;
         function scheduleRecompute() {
           if (rafScheduled) return;
