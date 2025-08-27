@@ -76,20 +76,20 @@ body {
   text-align: center;
   z-index: 100;
 }
-nav {
+#primary-nav {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-nav ul {
+#primary-nav ul {
   display: flex;
   gap: 1em;
   list-style: none;
 }
-nav a {
+#primary-nav a {
   text-decoration: none;
 }
-nav a:not(.active) {
+#primary-nav a:not(.active) {
   color: oklch(from var(--clrPrimary) 50% 0% h);
   text-shadow: none;
 }

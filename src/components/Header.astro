@@ -1,20 +1,19 @@
 ---
-import HeaderLink from '@/components/HeaderLink.astro';
+import HeaderLink from "@/components/HeaderLink.astro";
 
 // TODO: Consideration
 // https://developer.chrome.com/docs/css-ui/sticky-headers
 ---
 
 <header id="nav-wrapper">
-	<nav>
-		<ul>
-			<li>
-				<HeaderLink href="/" aria-label="Home">HOME</HeaderLink>
-			</li>
-			<li>
-				<HeaderLink href="/echoes">ECHOES</HeaderLink>
-			</li>
-		</ul>
-	</nav>
+  <nav id="primary-nav">
+    <ul>
+      <li>
+        <HeaderLink href="/" aria-label="Home">HOME</HeaderLink>
+      </li>
+      <li>
+        <HeaderLink href="/echoes">ECHOES</HeaderLink>
+      </li>
+    </ul>
+  </nav>
 </header>
-
