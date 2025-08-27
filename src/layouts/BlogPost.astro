@@ -67,7 +67,7 @@ for (const heading of filteredHeadings) {
           <h2 id="toc-label" class="sr-only">Table of contents</h2>
 
           {
-            tocHeadings && (
+            tocHeadings.length > 0 ? (
               <ol>
                 {tocHeadings.map((heading) => (
                   <li>
@@ -84,6 +84,8 @@ for (const heading of filteredHeadings) {
                   </li>
                 ))}
               </ol>
+            ) : (
+              <span class="no-toc">This article does not have a table of contents.</span>
             )
           }
         </nav>

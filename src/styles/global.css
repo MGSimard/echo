@@ -327,6 +327,9 @@ hr {
   display: inline-block;
   line-height: 1.2;
 }
+#toc > ol > li:not(:last-child) {
+  margin-bottom: 0.5em;
+}
 #toc > ol > li > a {
   display: inline-block;
   font-size: 1.4rem;
@@ -335,41 +338,32 @@ hr {
 #toc > ol > li > a.observed {
   color: var(--clrPrimary);
 }
+#toc > ol > li > a::before {
+  content: "▪";
+  position: absolute;
+  left: -1em;
+  top: 0;
+  pointer-events: none;
+}
 #toc > ol > li > a.observed::before {
-  content: "▸";
-  position: absolute;
-  left: -1em;
-  top: 0;
   color: var(--clrPrimary);
-  pointer-events: none;
-}
-/* Mirror observed styles for aria-current links */
-#toc > ol > li > a[aria-current="true"] {
-  color: var(--clrPrimary);
-}
-#toc > ol > li > a[aria-current="true"]::before {
-  content: "▸";
-  position: absolute;
-  left: -1em;
-  top: 0;
-  color: var(--clrPrimary);
-  pointer-events: none;
 }
 /* H3 TOC */
 #toc li li {
   font-size: 1.4rem;
 }
-#toc li li a.observed {
-  color: var(--clrPrimary);
-}
-#toc li li a[aria-current="true"] {
-  color: var(--clrPrimary);
-}
-#toc li li a.observed::before {
-  content: "|";
+#toc li li a::before {
+  content: "▫";
   position: absolute;
   left: -1em;
   top: 0;
-  color: var(--clrPrimary);
   pointer-events: none;
+}
+#toc li li a.observed::before {
+  color: var(--clrPrimary);
+}
+.no-toc {
+  display: block;
+  font-size: 1.4rem;
+  color: var(--clrDetail);
 }
