@@ -1,43 +1,43 @@
 ---
 // import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseHead from '@/components/BaseHead.astro';
+import { getCollection } from "astro:content";
+import BaseHead from "@/components/BaseHead.astro";
 // import ScreenGlow from '@/components/ScreenGlow.astro';
-import Header from '@/components/Header.astro';
-import Footer from '@/components/Footer.astro';
-import FormattedDate from '@/components/FormattedDate.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts';
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import FormattedDate from "@/components/FormattedDate.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/consts";
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 // TODO Find nice layout for hero image previews
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<!-- <ScreenGlow /> -->
-		<Header />
-		<main>
-				<ol id="echoes-list">
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/echoes/${post.id}/`}>
-									<h2>{post.data.title}</h2>
-									<span >
-										<FormattedDate date={post.data.pubDate} />
-									</span>
-								</a>
-							</li>
-						))
-					}
-				</ol>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <!-- <ScreenGlow /> -->
+    <Header />
+    <main>
+      <div class="gutter" aria-hidden="true"><!-- Fill Gutter --></div>
+      <ol id="echoes-list">
+        {
+          posts.map((post) => (
+            <li>
+              <a href={`/echoes/${post.id}/`}>
+                <h2>{post.data.title}</h2>
+                <span>
+                  <FormattedDate date={post.data.pubDate} />
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="gutter" aria-hidden="true"><!-- Fill Gutter --></div>
+    </main>
+    <Footer />
+  </body>
 </html>

@@ -1,46 +1,51 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import BaseHead from '@/components/BaseHead.astro';
-import Footer from '@/components/Footer.astro';
-import FormattedDate from '@/components/FormattedDate.astro';
-import Header from '@/components/Header.astro';
+import type { CollectionEntry } from "astro:content";
+import BaseHead from "@/components/BaseHead.astro";
+import Footer from "@/components/Footer.astro";
+import FormattedDate from "@/components/FormattedDate.astro";
+import Header from "@/components/Header.astro";
 // import ScreenGlow from '@/components/ScreenGlow.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<"blog">["data"];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
 
 <html lang="en">
-	<head>
-		<BaseHead title={title} description={description} />
-	</head>
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
 
-	<body>
-		<!-- <ScreenGlow /> -->
-		<Header />
-		<main>
-			<article>
-				{heroImage && <img src={heroImage.src} alt="" class="hero-image" decoding="async" fetchpriority="high" />}
-				<div class="prose">
-					<header class="title">
-						<h1>{title}</h1>
-						<span class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<span class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</span>
-								)
-							}
-						</span>
-						<hr />
-					</header>
-					<slot />
-				</div>
-			</article>
-		</main>
-		<Footer />
-	</body>
+  <body>
+    <!-- <ScreenGlow /> -->
+    <Header />
+    <main>
+      <div class="gutter" aria-hidden="true"><!-- Fill Gutter --></div>
+      <article>
+        {heroImage && <img src={heroImage.src} alt="" class="hero-image" decoding="async" fetchpriority="high" />}
+        <div class="prose">
+          <header class="title">
+            <h1>{title}</h1>
+            <span class="date">
+              <FormattedDate date={pubDate} />
+              {
+                updatedDate && (
+                  <span class="last-updated-on">
+                    Last updated on <FormattedDate date={updatedDate} />
+                  </span>
+                )
+              }
+            </span>
+            <hr />
+          </header>
+          <slot />
+        </div>
+      </article>
+      <aside class="gutter">
+        <!-- Table of Contents -->
+        <nav>ToC here</nav>
+      </aside>
+    </main>
+    <Footer />
+  </body>
 </html>
