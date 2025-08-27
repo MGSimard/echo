@@ -9,7 +9,7 @@ import react from "@astrojs/react";
 // https://astro.build/config
 export default defineConfig({
   site: "https://example.com", // TODO: Update with final deployment URL
-  trailingSlash: "never",
+  trailingSlash: "ignore",
   integrations: [
     mdx(),
     sitemap(),

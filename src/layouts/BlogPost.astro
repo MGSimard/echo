@@ -38,7 +38,7 @@ for (const heading of filteredHeadings) {
 
   <body>
     <!-- <ScreenGlow /> -->
-    <Header />
+    <Header currentTitle={title} currentHref={Astro.url.pathname} />
     <main>
       <div class="gutter" aria-hidden="true"><!-- Fill Gutter --></div>
       <article>
@@ -63,8 +63,8 @@ for (const heading of filteredHeadings) {
       </article>
       <aside class="gutter">
         <!-- Table of Contents -->
-        <nav id="toc">
-          toc
+        <nav id="toc" aria-labelledby="toc-label">
+          <h2 id="toc-label" class="sr-only">Table of contents</h2>
 
           {
             tocHeadings && (
@@ -93,16 +93,22 @@ for (const heading of filteredHeadings) {
     <script>
       const tocEl = document.getElementById("toc") as HTMLElement | null;
       if (tocEl) {
-        const headings = Array.from(document.querySelectorAll(".prose h2[id], .prose h3[id]")) as HTMLElement[];
-        const isNotFootnotes = (el: HTMLElement) => el.id !== "footnote-label" && !el.closest(".footnotes");
-        const observedHeadings: HTMLElement[] = headings.filter((h) => !!h.id && isNotFootnotes(h));
-        const FOCUS_OFFSET_PX = 160; // adjust as desired
-        const DEBUG_TOC = true; // set to false to hide overlay
-        const H2_MIN_VISIBLE_RATIO = 0.25; // how much of an H2 must be inside the window
-        const H3_MIN_VISIBLE_RATIO = 0.12; // how much of an H3 must be inside the window
+        const FOCUS_OFFSET_TOP_PX = 72; // px: compensate fixed navbar + desired focus band
+        const FOCUS_OFFSET_BOTTOM_PX = 256; // px: size of bottom exclusion zone
+        const DEBUG_TOC = true; // keep debug overlay visible
 
-        // Debug overlay to visualize the detection window
-        if (DEBUG_TOC) {
+        // State
+        let observedHeadings: HTMLElement[] = [];
+        const idToLink = new Map<string, HTMLElement>();
+        const h3ToParentH2Id = new Map<string, string>();
+        const activeH2Ids = new Set<string>();
+        const activeH3Ids = new Set<string>();
+        let observer: IntersectionObserver | null = null;
+        let fallbackH2Id: string | null = null; // computed when no H2 intersects
+
+        function ensureDebugOverlay() {
+          if (!DEBUG_TOC) return;
+          if (document.getElementById("toc-debug-overlay")) return;
           const overlay = document.createElement("div");
           overlay.id = "toc-debug-overlay";
           Object.assign(overlay.style, {
@@ -115,7 +121,7 @@ for (const heading of filteredHeadings) {
           const topLine = document.createElement("div");
           Object.assign(topLine.style, {
             position: "absolute",
-            top: `${FOCUS_OFFSET_PX}px`,
+            top: `${FOCUS_OFFSET_TOP_PX}px`,
             left: "0",
             right: "0",
             height: "0",
@@ -125,7 +131,7 @@ for (const heading of filteredHeadings) {
           const bottomLine = document.createElement("div");
           Object.assign(bottomLine.style, {
             position: "absolute",
-            bottom: `${FOCUS_OFFSET_PX}px`,
+            bottom: `${FOCUS_OFFSET_BOTTOM_PX}px`,
             left: "0",
             right: "0",
             height: "0",
@@ -137,57 +143,46 @@ for (const heading of filteredHeadings) {
           document.body.appendChild(overlay);
         }
 
-        // Map heading id -> corresponding TOC link
-        const idToLink = new Map<string, HTMLElement>();
-        observedHeadings.forEach((h) => {
-          const a = (tocEl as HTMLElement).querySelector<HTMLElement>(`a[href="#${h.id}"]`);
-          if (a) idToLink.set(h.id, a);
-        });
+        function mapIdToLink() {
+          idToLink.clear();
+          observedHeadings.forEach((h) => {
+            const a = (tocEl as HTMLElement).querySelector<HTMLElement>(`a[href="#${h.id}"]`);
+            if (a) idToLink.set(h.id, a);
+          });
+        }
 
-        // Ensure no link is pre-marked via hash; IntersectionObserver governs highlighting exclusively
-        (tocEl as HTMLElement).querySelectorAll("a.observed").forEach((a) => a.classList.remove("observed"));
-        (tocEl as HTMLElement).querySelectorAll("li.observed").forEach((li) => li.classList.remove("observed"));
+        // No hash-based highlighting; IntersectionObserver governs state.
 
-        function clearHashObserved() {
-          const hashId = (location.hash || "").slice(1);
-          if (!hashId) return;
-          const link = idToLink.get(hashId);
-          if (link) {
-            link.classList.remove("observed");
-            const li = link.closest("li");
-            if (li) li.classList.remove("observed");
+        function buildHeadingRelations() {
+          h3ToParentH2Id.clear();
+          let lastH2Id: string | null = null;
+          for (const el of observedHeadings) {
+            if (el.tagName === "H2") lastH2Id = el.id;
+            if (el.tagName === "H3" && lastH2Id) h3ToParentH2Id.set(el.id, lastH2Id);
           }
         }
-        window.addEventListener("hashchange", clearHashObserved, { passive: true } as AddEventListenerOptions);
-        clearHashObserved();
-
-        // Track H2/H3 relationships so that a visible H3 also marks its parent H2 as observed
-        const h3ToParentH2Id = new Map<string, string>();
-        let lastH2Id: string | null = null;
-        for (const el of observedHeadings) {
-          if (el.tagName === "H2") lastH2Id = el.id;
-          if (el.tagName === "H3" && lastH2Id) h3ToParentH2Id.set(el.id, lastH2Id);
-        }
-
-        const activeH2Ids = new Set<string>();
-        const activeH3Ids = new Set<string>();
 
         function applyObservedClasses() {
           // Clear all
           (tocEl as HTMLElement).querySelectorAll("a.observed").forEach((a) => a.classList.remove("observed"));
           (tocEl as HTMLElement).querySelectorAll("li.observed").forEach((li) => li.classList.remove("observed"));
+          (tocEl as HTMLElement)
+            .querySelectorAll('a[aria-current="true"]')
+            .forEach((a) => a.removeAttribute("aria-current"));
 
           // Apply H3 observed
           activeH3Ids.forEach((id) => {
             const link = idToLink.get(id);
             if (!link) return;
             link.classList.add("observed");
+            link.setAttribute("aria-current", "true");
             const li = link.closest("li");
             if (li) li.classList.add("observed");
           });
 
           // Apply H2 observed: visible H2 or parents of visible H3
           const toHighlightH2 = new Set<string>(activeH2Ids);
+          if (fallbackH2Id) toHighlightH2.add(fallbackH2Id);
           activeH3Ids.forEach((h3id) => {
             const parentId = h3ToParentH2Id.get(h3id);
             if (parentId) toHighlightH2.add(parentId);
@@ -196,40 +191,142 @@ for (const heading of filteredHeadings) {
             const link = idToLink.get(id);
             if (!link) return;
             link.classList.add("observed");
+            link.setAttribute("aria-current", "true");
             const li = link.closest("li");
             if (li) li.classList.add("observed");
           });
         }
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              const el = entry.target as HTMLElement;
-              const id = el.id;
-              const isH2 = el.tagName === "H2";
-              const isH3 = el.tagName === "H3";
-              const ratio = entry.intersectionRatio;
-              const h2Intersecting = entry.isIntersecting && ratio >= H2_MIN_VISIBLE_RATIO;
-              const h3Intersecting = entry.isIntersecting && ratio >= H3_MIN_VISIBLE_RATIO;
+        // Compute fallback H2 id for the current section when no H2 intersects
+        // the focus band. This avoids a sticky previous section.
+        function computeFallbackH2Id() {
+          fallbackH2Id = null;
+          if (activeH2Ids.size > 0) return; // real intersection wins
+          const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+          const topPx = FOCUS_OFFSET_TOP_PX;
+          const bottomPx = FOCUS_OFFSET_BOTTOM_PX;
+          const focusTop = topPx;
+          const focusBottom = viewportHeight - bottomPx;
+          const h2s = observedHeadings.filter((h) => h.tagName === "H2");
 
-              if (isH2) {
-                if (h2Intersecting) activeH2Ids.add(id);
-                else activeH2Ids.delete(id);
-              } else if (isH3) {
-                if (h3Intersecting) activeH3Ids.add(id);
-                else activeH3Ids.delete(id);
-              }
+          for (let i = 0; i < h2s.length; i++) {
+            const cur = h2s[i];
+            if (!cur) continue;
+            const next = i + 1 < h2s.length ? h2s[i + 1] : null;
+            const curTop = cur.getBoundingClientRect().top;
+            const nextTop = next ? next.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
+            // last H2 above the focusTop while the next H2 hasn't started
+            if (curTop <= focusTop && nextTop > focusTop) {
+              fallbackH2Id = cur.id;
+              return;
             }
-            applyObservedClasses();
-          },
-          {
-            root: null,
-            rootMargin: `-${FOCUS_OFFSET_PX}px 0px -${FOCUS_OFFSET_PX}px 0px`,
-            threshold: [0, H3_MIN_VISIBLE_RATIO, H2_MIN_VISIBLE_RATIO],
           }
-        );
+          // Fallback: any H2 whose box intersects the focus band
+          for (const cur of h2s) {
+            const rect = cur.getBoundingClientRect();
+            if (rect.bottom > focusTop && rect.top < focusBottom) {
+              fallbackH2Id = cur.id;
+              return;
+            }
+          }
+        }
 
-        observedHeadings.forEach((h) => observer.observe(h));
+        function connectObserver() {
+          const topPx = FOCUS_OFFSET_TOP_PX;
+          const bottomPx = FOCUS_OFFSET_BOTTOM_PX;
+          observer = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                const el = entry.target as HTMLElement;
+                const id = el.id;
+                const isH2 = el.tagName === "H2";
+                const isH3 = el.tagName === "H3";
+
+                if (isH2) {
+                  if (entry.isIntersecting) activeH2Ids.add(id);
+                  else activeH2Ids.delete(id);
+                } else if (isH3) {
+                  if (entry.isIntersecting) activeH3Ids.add(id);
+                  else activeH3Ids.delete(id);
+                }
+              }
+              computeFallbackH2Id();
+              applyObservedClasses();
+            },
+            {
+              root: null,
+              rootMargin: `-${topPx}px 0px -${bottomPx}px 0px`,
+              threshold: [0],
+            }
+          );
+
+          observedHeadings.forEach((h) => observer?.observe(h));
+        }
+
+        function disconnectObserver() {
+          if (observer) {
+            observer.disconnect();
+            observer = null;
+          }
+        }
+
+        function primeInitialHighlight() {
+          activeH2Ids.clear();
+          activeH3Ids.clear();
+          const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+          const topPx = FOCUS_OFFSET_TOP_PX;
+          const bottomPx = FOCUS_OFFSET_BOTTOM_PX;
+          const topBound = topPx;
+          const bottomBound = viewportHeight - bottomPx;
+          for (const el of observedHeadings) {
+            const rect = el.getBoundingClientRect();
+            const intersects = rect.bottom > topBound && rect.top < bottomBound;
+            if (!intersects) continue;
+            if (el.tagName === "H2") activeH2Ids.add(el.id);
+            if (el.tagName === "H3") activeH3Ids.add(el.id);
+          }
+          computeFallbackH2Id();
+          applyObservedClasses();
+        }
+
+        function initTOC() {
+          ensureDebugOverlay();
+
+          const headings = Array.from(document.querySelectorAll(".prose h2[id], .prose h3[id]")) as HTMLElement[];
+          const isNotFootnotes = (el: HTMLElement) => el.id !== "footnote-label" && !el.closest(".footnotes");
+          observedHeadings = headings.filter((h) => !!h.id && isNotFootnotes(h));
+
+          mapIdToLink();
+          buildHeadingRelations();
+
+          // Clear any previous state before we attach observers
+          (tocEl as HTMLElement).querySelectorAll("a.observed").forEach((a) => a.classList.remove("observed"));
+          (tocEl as HTMLElement).querySelectorAll("li.observed").forEach((li) => li.classList.remove("observed"));
+          (tocEl as HTMLElement)
+            .querySelectorAll('a[aria-current="true"]')
+            .forEach((a) => a.removeAttribute("aria-current"));
+
+          disconnectObserver();
+          connectObserver();
+          primeInitialHighlight();
+        }
+
+        initTOC();
+        // Proactively recompute fallback highlight during scrolling/resizing so
+        // a previously chosen section does not remain sticky.
+        let rafScheduled = false;
+        function scheduleRecompute() {
+          if (rafScheduled) return;
+          rafScheduled = true;
+          requestAnimationFrame(() => {
+            rafScheduled = false;
+            computeFallbackH2Id();
+            applyObservedClasses();
+          });
+        }
+        window.addEventListener("scroll", scheduleRecompute, { passive: true } as AddEventListenerOptions);
+        window.addEventListener("resize", scheduleRecompute, { passive: true } as AddEventListenerOptions);
+        document.addEventListener("astro:after-swap", initTOC as EventListener);
       }
     </script>
   </body>

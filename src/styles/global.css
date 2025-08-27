@@ -70,27 +70,43 @@ body {
   left: 50%;
   padding: 1.2rem 2.4rem;
   width: auto;
+  max-width: min(var(--contentMaxWidth), calc(100vw - (var(--sitePadding) * 2)));
   background-color: var(--clrCardBg);
   border: 1px solid var(--clrBorder);
   text-transform: uppercase;
   text-align: center;
   z-index: 100;
+  overflow: hidden;
 }
 #primary-nav {
   display: flex;
   justify-content: center;
   align-items: center;
+  color: oklch(from var(--clrText) 50% 0% h);
 }
 #primary-nav ul {
   display: flex;
   gap: 1em;
   list-style: none;
+  width: 100%;
+}
+#primary-nav .breadcrumb-current {
+  flex: 1 1 0;
+  min-width: 0;
+}
+#primary-nav .breadcrumb-current a,
+#primary-nav .breadcrumb-current span {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 #primary-nav a {
   text-decoration: none;
 }
-#primary-nav a:not(.active) {
-  color: oklch(from var(--clrPrimary) 50% 0% h);
+#primary-nav .active {
+  color: var(--clrText);
   text-shadow: none;
 }
 main {
@@ -101,8 +117,11 @@ main {
   width: 100%;
   margin: 0 auto;
   padding: var(--sitePadding);
-  border: 1px solid var(--clrBorder);
   line-height: 1.6;
+}
+main > *:not(.gutter) {
+  border: 1px solid var(--clrBorder);
+  padding: 2.4rem;
 }
 @media only screen and (max-width: 768px) {
   main {
@@ -116,7 +135,7 @@ main {
 }
 footer {
   flex-shrink: 0;
-  padding: 2rem var(--sitePadding) 4rem var(--sitePadding);
+  padding: 12rem var(--sitePadding) 12rem var(--sitePadding);
   text-align: center;
   color: oklch(from var(--clrPrimary) 50% 0% h);
   text-shadow: none;
@@ -136,7 +155,9 @@ h1 {
 h2 {
   font-size: 1.5em;
 }
-h3,
+h3 {
+  font-size: 1.2em;
+}
 h4,
 h5,
 h6 {
@@ -278,7 +299,7 @@ hr {
   max-width: 24rem;
   background-color: var(--clrCardBg);
   padding: 1.2rem 2.4rem;
-  font-weight: 100;
+  font-weight: 200;
   color: var(--clrDetail);
   border: 1px solid var(--clrBorder);
 }
@@ -292,8 +313,22 @@ hr {
   position: relative;
   text-decoration: none;
 }
+/* Focus styles for keyboard users */
+#toc a:focus-visible {
+  outline: 2px solid var(--clrPrimary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
 /* H2 TOC */
+#toc a:hover {
+  color: var(--clrText);
+}
+#toc a {
+  display: inline-block;
+  line-height: 1.2;
+}
 #toc > ol > li > a {
+  display: inline-block;
   font-size: 1.4rem;
   text-transform: uppercase;
 }
@@ -308,6 +343,18 @@ hr {
   color: var(--clrPrimary);
   pointer-events: none;
 }
+/* Mirror observed styles for aria-current links */
+#toc > ol > li > a[aria-current="true"] {
+  color: var(--clrPrimary);
+}
+#toc > ol > li > a[aria-current="true"]::before {
+  content: "▸";
+  position: absolute;
+  left: -1em;
+  top: 0;
+  color: var(--clrPrimary);
+  pointer-events: none;
+}
 /* H3 TOC */
 #toc li li {
   font-size: 1.4rem;
@@ -315,11 +362,14 @@ hr {
 #toc li li a.observed {
   color: var(--clrPrimary);
 }
-/* #toc li li a.observed::before {
-  content: "▹";
+#toc li li a[aria-current="true"] {
+  color: var(--clrPrimary);
+}
+#toc li li a.observed::before {
+  content: "|";
   position: absolute;
   left: -1em;
   top: 0;
   color: var(--clrPrimary);
   pointer-events: none;
-} */
+}

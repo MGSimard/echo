@@ -3,6 +3,12 @@ import HeaderLink from "@/components/HeaderLink.astro";
 
 // TODO: Consideration
 // https://developer.chrome.com/docs/css-ui/sticky-headers
+type Props = {
+  currentTitle?: string;
+  currentHref?: string;
+};
+
+const { currentTitle, currentHref } = Astro.props as Props;
 ---
 
 <header id="nav-wrapper">
@@ -14,6 +20,26 @@ import HeaderLink from "@/components/HeaderLink.astro";
       <li>
         <HeaderLink href="/echoes">ECHOES</HeaderLink>
       </li>
+      {
+        currentTitle && (
+          <Fragment>
+            <li class="breadcrumb-sep" aria-hidden="true">
+              /
+            </li>
+            <li class="breadcrumb-current">
+              {currentHref ? (
+                <HeaderLink href={currentHref} aria-current="page" title={currentTitle}>
+                  {currentTitle}
+                </HeaderLink>
+              ) : (
+                <span aria-current="page" title={currentTitle}>
+                  {currentTitle}
+                </span>
+              )}
+            </li>
+          </Fragment>
+        )
+      }
     </ul>
   </nav>
 </header>
