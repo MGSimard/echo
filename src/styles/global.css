@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  outline: 1px solid red;
+  /* outline: 1px solid red; */
 }
 :root {
   --contentMaxWidth: 768px;
@@ -68,7 +68,7 @@ body {
   top: var(--sitePadding);
   transform: translateX(-50%);
   left: 50%;
-  padding: 1.2rem var(--sitePadding);
+  padding: 1.2rem 2.4rem;
   width: auto;
   background-color: var(--clrCardBg);
   border: 1px solid var(--clrBorder);
@@ -263,4 +263,18 @@ hr {
 .prose mark {
   color: var(--clrBg);
   background-color: var(--clrText);
+}
+#toc {
+  position: sticky;
+  top: var(--sitePadding);
+  max-width: 30rem;
+  background-color: var(--clrCardBg);
+  padding: 1rem;
+  border: 1px solid var(--clrBorder);
+}
+#toc ol {
+  list-style: none;
+}
+#toc li > ol {
+  margin-left: 1em;
 }
