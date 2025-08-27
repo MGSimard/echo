@@ -135,10 +135,10 @@ main > *:not(.gutter) {
 }
 footer {
   flex-shrink: 0;
-  padding: 12rem var(--sitePadding) 12rem var(--sitePadding);
+  padding: 8rem var(--sitePadding) 12rem var(--sitePadding);
   text-align: center;
-  color: oklch(from var(--clrPrimary) 50% 0% h);
-  text-shadow: none;
+  color: var(--clrDetail);
+  border-top: 1px solid var(--clrBorder);
 }
 h1,
 h2,
