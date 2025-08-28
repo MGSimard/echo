@@ -2,6 +2,7 @@
 
 ## Task List
 
+- [ ] Create a linting plugin that rejects usage of #h1 in content markdown/mdx
 - [ ] Update final deployment URL in astro.config.mjs
 
 ---
