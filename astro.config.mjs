@@ -10,6 +10,7 @@ import react from "@astrojs/react";
 export default defineConfig({
   site: "https://example.com", // TODO: Update with final deployment URL
   trailingSlash: "ignore",
+  prefetch: true,
   integrations: [
     mdx(),
     sitemap(),

@@ -10,4 +10,4 @@ const hrefStr = typeof href === "string" ? href : href ? String(href) : "";
 const isActive = normalize(hrefStr) === normalize(pathname);
 ---
 
-<a href={href} class:list={[className, { active: isActive }]} {...props}><slot /></a>
+<a href={href} class:list={[className, { active: isActive }]} data-astro-prefetch {...props}><slot /></a>
