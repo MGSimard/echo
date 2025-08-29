@@ -74,7 +74,7 @@ body {
 }
 #primary-nav .toc-nav-btn {
   margin-left: auto;
-  display: flex;
+  display: none;
   align-items: center;
 }
 #primary-nav .toc-nav-toggle {
@@ -455,6 +455,9 @@ hr {
   /* Show nav button at this breakpoint */
   #primary-nav .toc-nav-toggle {
     display: inline-flex;
+  }
+  #primary-nav .toc-nav-btn {
+    display: flex;
   }
 
   .toc-toggle {
