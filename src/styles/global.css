@@ -24,7 +24,7 @@ html {
   color: var(--clrText);
   background-color: var(--clrBg);
   scroll-behavior: smooth;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -36,48 +36,67 @@ body {
   flex-direction: column;
   gap: 1.6rem;
   min-height: 100dvh;
+  padding: 2.4rem var(--sitePadding);
   font-size: 1.6rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
-#nav-wrapper {
+#site-header {
   flex-shrink: 0;
-  position: sticky;
-  top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 50%, var(--contentMaxWidth)) minmax(0, 1fr);
+  gap: 1.6rem;
+  width: 100%;
   margin: 0 auto;
-  padding: 1.2rem 2.4rem;
-  width: auto;
-  max-width: min(var(--contentMaxWidth), calc(100% - (var(--sitePadding) * 2)));
-  background-color: var(--clrCardBg);
-  border: 1px solid var(--clrBorder);
   text-transform: uppercase;
   text-align: center;
   z-index: 100;
+}
+#site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  color: oklch(from var(--clrText) 50% 0% h);
+  min-width: 0;
   overflow: hidden;
 }
-#primary-nav {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: oklch(from var(--clrText) 50% 0% h);
+.nhs {
+  flex-grow: 1;
+  position: relative;
+  border-top: 1px solid var(--clrBorder);
+  min-width: 4rem;
 }
-#primary-nav ul {
+.nhs::before {
+  position: absolute;
+  content: "";
+  display: block;
+  height: 1rem;
+  top: 0;
+}
+.nhs:first-child::before {
+  border-left: 1px solid var(--clrBorder);
+  left: 0;
+}
+.nhs:last-child::before {
+  border-right: 1px solid var(--clrBorder);
+  right: 0;
+}
+#site-nav ul {
   display: flex;
   align-items: center;
   gap: 1em;
   list-style: none;
-  width: 100%;
-}
-#primary-nav .breadcrumb-current {
-  flex: 1 1 0;
   min-width: 0;
 }
-#primary-nav .toc-nav-btn {
+#site-nav .breadcrumb-current {
+  min-width: 0;
+}
+#site-nav .toc-nav-btn {
   margin-left: auto;
   display: none;
   align-items: center;
 }
-#primary-nav .toc-nav-toggle {
+#site-nav .toc-nav-toggle {
   display: none;
   align-items: center;
   justify-content: center;
@@ -87,22 +106,22 @@ body {
   background: transparent;
   cursor: pointer;
 }
-#primary-nav .toc-nav-toggle svg {
+#site-nav .toc-nav-toggle svg {
   width: 1em;
   height: 1em;
 }
-#primary-nav .breadcrumb-current a,
-#primary-nav .breadcrumb-current span {
+#site-nav .breadcrumb-current a,
+#site-nav .breadcrumb-current span {
   display: block;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-#primary-nav a {
+#site-nav a {
   text-decoration: none;
 }
-#primary-nav .active {
+#site-nav .active {
   color: var(--clrText);
   text-shadow: none;
 }
@@ -113,14 +132,13 @@ main {
   gap: 1.6rem;
   width: 100%;
   margin: 0 auto;
-  padding-inline: var(--sitePadding);
   line-height: 1.6;
 }
 main > *:not(.gutter):not(.toc-aside) {
-  border: 1px solid var(--clrBorder);
   padding: 2.4rem;
 }
 @media only screen and (max-width: 1200px) {
+  #site-header,
   main {
     grid-template-columns: minmax(0, 1fr);
     max-width: var(--contentMaxWidth);
@@ -132,8 +150,9 @@ main > *:not(.gutter):not(.toc-aside) {
 }
 footer {
   flex-shrink: 0;
+  width: 100%;
   margin: 0 auto;
-  padding: 8rem var(--sitePadding) 12rem var(--sitePadding);
+  padding-block: 8rem 12rem;
   text-align: center;
   color: var(--clrDetail);
 }
@@ -195,13 +214,9 @@ hr {
   height: 1px;
   width: 1px;
   overflow: hidden;
-  /* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
   clip: rect(1px 1px 1px 1px);
-  /* maybe deprecated but we need to support legacy browsers */
   clip: rect(1px, 1px, 1px, 1px);
-  /* modern browsers, clip-path works inwards from each corner */
   clip-path: inset(50%);
-  /* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
   white-space: nowrap;
 }
 .last-updated-on {
@@ -260,7 +275,6 @@ hr {
 .title h1 {
   margin-bottom: 0;
 }
-/* Removed sticky header ToC toggle styles */
 .date {
   display: block;
   color: var(--clrDetail);
@@ -281,7 +295,6 @@ hr {
 .prose > h6:not(:last-child) {
   margin-bottom: 1.33em;
 }
-/* Ensure anchored headings don't stick to the very top; honor site padding */
 .prose h2,
 .prose h3 {
   scroll-margin-top: calc(var(--sitePadding) * 3);
@@ -322,11 +335,9 @@ hr {
   font-weight: 200;
   color: var(--clrDetail);
   border: 1px solid var(--clrBorder);
-  /* Prevent overflow and enable scrolling within the ToC */
   max-height: calc(100dvh - (var(--sitePadding) * 2));
   overflow-y: auto;
   overflow-x: hidden;
-  /* Thin scrollbar (Firefox) */
   scrollbar-width: thin;
   scrollbar-color: var(--clrDetail) transparent;
   z-index: 1001;
@@ -352,7 +363,6 @@ hr {
   position: relative;
   text-decoration: none;
 }
-/* Focus styles for keyboard users */
 #toc a:focus-visible {
   outline: 2px solid var(--clrPrimary);
   outline-offset: 2px;
@@ -406,8 +416,6 @@ hr {
   font-size: 1.4rem;
   color: var(--clrDetail);
 }
-
-/* TOC controls: hidden by default (desktop) */
 .toc-toggle {
   position: absolute;
   border: 0;
@@ -428,12 +436,10 @@ hr {
 
 /* TOC mobile drawer */
 @media only screen and (max-width: 1200px) {
-  /* Use the new aside wrapper so we can have FAB and scrim */
   .toc-aside {
     position: relative;
   }
 
-  /* Floating Action Button to open drawer */
   .toc-fab {
     display: none;
     align-items: center;
@@ -452,11 +458,10 @@ hr {
     cursor: pointer;
   }
 
-  /* Show nav button at this breakpoint */
-  #primary-nav .toc-nav-toggle {
+  #site-nav .toc-nav-toggle {
     display: inline-flex;
   }
-  #primary-nav .toc-nav-btn {
+  #site-nav .toc-nav-btn {
     display: flex;
   }
 
@@ -468,7 +473,6 @@ hr {
     pointer-events: none;
   }
 
-  /* Drawer panel overrides sticky card */
   #toc {
     position: fixed;
     left: 0;
@@ -487,7 +491,6 @@ hr {
     border-radius: 8px 8px 0 0;
   }
 
-  /* Close button inside drawer */
   .toc-close {
     display: inline-flex;
     align-items: center;
@@ -516,7 +519,6 @@ hr {
     background: var(--clrDetail);
   }
 
-  /* Scrim overlay */
   .toc-scrim {
     display: block;
     position: fixed;
@@ -529,7 +531,6 @@ hr {
     z-index: 1000;
   }
 
-  /* Open state via checkbox */
   .toc-toggle:checked ~ #toc {
     transform: translateY(0%);
   }
@@ -541,7 +542,6 @@ hr {
     display: none;
   }
 
-  /* Hide desktop gutter aside on mobile */
   .gutter {
     display: none;
   }

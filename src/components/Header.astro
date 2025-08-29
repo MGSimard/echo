@@ -9,11 +9,13 @@ type Props = {
 const { currentTitle } = Astro.props as Props;
 ---
 
-<header id="nav-wrapper">
-  <nav id="primary-nav">
+<header id="site-header">
+  <div class="gutter" aria-hidden="true"></div>
+  <nav id="site-nav">
+    <div class="nhs" aria-hidden="true"></div>
     <ul>
       <li>
-        <HeaderLink href="/" aria-label="Home">HOME</HeaderLink>
+        <HeaderLink href="/">HOME</HeaderLink>
       </li>
       <li>
         <HeaderLink href="/echoes">ECHOES</HeaderLink>
@@ -25,7 +27,7 @@ const { currentTitle } = Astro.props as Props;
               /
             </li>
             <li class="breadcrumb-current">
-              <span class="active" aria-current="page" title={currentTitle}>
+              <span class="active" aria-current="page">
                 {currentTitle}
               </span>
             </li>
@@ -33,15 +35,7 @@ const { currentTitle } = Astro.props as Props;
         )
       }
       <li class="toc-nav-btn">
-        <label
-          for="toc-toggle"
-          class="toc-nav-toggle"
-          aria-controls="toc"
-          aria-expanded="false"
-          aria-haspopup="dialog"
-          aria-label="Open table of contents"
-          role="button"
-          tabindex="0">
+        <label for="toc-toggle" class="toc-nav-toggle" aria-controls="toc" aria-expanded="false" role="button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -61,5 +55,7 @@ const { currentTitle } = Astro.props as Props;
         </label>
       </li>
     </ul>
+    <div class="nhs" aria-hidden="true"></div>
   </nav>
+  <div class="gutter" aria-hidden="true"></div>
 </header>
