@@ -24,7 +24,7 @@ html {
   color: var(--clrText);
   background-color: var(--clrBg);
   scroll-behavior: smooth;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -88,6 +88,7 @@ body {
 }
 #primary-nav ul {
   display: flex;
+  align-items: center;
   gap: 1em;
   list-style: none;
   width: 100%;
@@ -95,6 +96,25 @@ body {
 #primary-nav .breadcrumb-current {
   flex: 1 1 0;
   min-width: 0;
+}
+#primary-nav .toc-nav-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+#primary-nav .toc-nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+#primary-nav .toc-nav-toggle svg {
+  width: 1em;
+  height: 1em;
 }
 #primary-nav .breadcrumb-current a,
 #primary-nav .breadcrumb-current span {
@@ -120,11 +140,11 @@ main {
   margin: 0 auto;
   line-height: 1.6;
 }
-main > *:not(.gutter) {
+main > *:not(.gutter):not(.toc-aside) {
   border: 1px solid var(--clrBorder);
   padding: 2.4rem;
 }
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 1200px) {
   main {
     grid-template-columns: minmax(0, 1fr);
     max-width: var(--contentMaxWidth);
@@ -269,6 +289,7 @@ hr {
 .title h1 {
   margin-bottom: 0;
 }
+/* Removed sticky header ToC toggle styles */
 .date {
   display: block;
   color: var(--clrDetail);
@@ -337,6 +358,7 @@ hr {
   /* Thin scrollbar (Firefox) */
   scrollbar-width: thin;
   scrollbar-color: var(--clrDetail) transparent;
+  z-index: 1001;
 }
 #toc::-webkit-scrollbar {
   width: 6px;
@@ -412,4 +434,141 @@ hr {
   display: block;
   font-size: 1.4rem;
   color: var(--clrDetail);
+}
+
+/* TOC controls: hidden by default (desktop) */
+.toc-toggle {
+  position: absolute;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.toc-fab,
+.toc-close,
+.toc-scrim {
+  display: none;
+}
+
+/* TOC mobile drawer */
+@media only screen and (max-width: 1200px) {
+  /* Use the new aside wrapper so we can have FAB and scrim */
+  .toc-aside {
+    position: relative;
+  }
+
+  /* Floating Action Button to open drawer */
+  .toc-fab {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    position: fixed;
+    right: var(--sitePadding);
+    bottom: calc(var(--sitePadding) + env(safe-area-inset-bottom));
+    z-index: 1002;
+    padding: 1.2rem;
+    background-color: var(--clrCardBg);
+    border: 1px solid var(--clrBorder);
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* Show nav button at this breakpoint */
+  #primary-nav .toc-nav-toggle {
+    display: inline-flex;
+  }
+
+  .toc-toggle {
+    position: fixed;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Drawer panel overrides sticky card */
+  #toc {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    max-width: none;
+    width: 100%;
+    max-height: 70dvh;
+    transform: translateY(105%);
+    transition: transform 200ms ease;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-top: 1px solid var(--clrBorder);
+    border-radius: 8px 8px 0 0;
+  }
+
+  /* Close button inside drawer */
+  .toc-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.6rem;
+    position: sticky;
+    top: 0;
+    margin: -1.2rem -2.4rem 1.2rem -2.4rem;
+    padding: 1.2rem 2.4rem;
+    width: calc(100% + 4.8rem);
+    background: var(--clrCardBg);
+    border: 0;
+    border-bottom: 1px solid var(--clrBorder);
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .toc-close::before {
+    content: "";
+    display: block;
+    width: 3.2rem;
+    height: 0.3rem;
+    border-radius: 9999px;
+    background: var(--clrDetail);
+  }
+
+  /* Scrim overlay */
+  .toc-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: oklch(from var(--clrBg) l c h / 0.6);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+    z-index: 1000;
+  }
+
+  /* Open state via checkbox */
+  .toc-toggle:checked ~ #toc {
+    transform: translateY(0%);
+  }
+  .toc-toggle:checked ~ .toc-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .toc-toggle:checked ~ .toc-fab {
+    display: none;
+  }
+
+  /* Hide desktop gutter aside on mobile */
+  .gutter {
+    display: none;
+  }
 }

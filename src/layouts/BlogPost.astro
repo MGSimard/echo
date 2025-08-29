@@ -5,6 +5,7 @@ import Footer from "@/components/Footer.astro";
 import FormattedDate from "@/components/FormattedDate.astro";
 import Header from "@/components/Header.astro";
 import type { MarkdownHeading } from "astro";
+import TableOfContents from "@lucide/astro/icons/table-of-contents";
 // import ScreenGlow from "@/components/ScreenGlow.astro";
 
 type Props = CollectionEntry<"blog">["data"] & { headings: MarkdownHeading[] };
@@ -58,13 +59,30 @@ for (const heading of filteredHeadings) {
             </span>
             <hr />
           </header>
+
           <slot />
         </div>
       </article>
-      <aside class="gutter">
+      <aside class="toc-aside">
+        <input type="checkbox" id="toc-toggle" class="toc-toggle" />
+        <label
+          for="toc-toggle"
+          class="toc-fab"
+          aria-controls="toc"
+          aria-expanded="false"
+          aria-haspopup="dialog"
+          aria-label="Open table of contents"
+          role="button"
+          tabindex="0">
+          <TableOfContents aria-hidden="true" />
+          <span class="sr-only">Contents</span>
+        </label>
         <!-- Table of Contents -->
         <nav id="toc" aria-labelledby="toc-label">
           <h2 id="toc-label" class="sr-only">Table of contents</h2>
+          <label for="toc-toggle" class="toc-close" aria-label="Close table of contents" role="button" tabindex="0"
+            >Close</label
+          >
 
           {
             tocHeadings.length > 0 ? (
@@ -89,6 +107,7 @@ for (const heading of filteredHeadings) {
             )
           }
         </nav>
+        <label for="toc-toggle" class="toc-scrim" aria-hidden="true"></label>
       </aside>
     </main>
     <Footer />
@@ -277,6 +296,106 @@ for (const heading of filteredHeadings) {
         window.addEventListener("scroll", scheduleRecompute, { passive: true } as AddEventListenerOptions);
         window.addEventListener("resize", scheduleRecompute, { passive: true } as AddEventListenerOptions);
         document.addEventListener("astro:after-swap", initTOC as EventListener);
+
+        // Mobile drawer a11y: keep aria-expanded in sync, trap focus, restore focus, close on link click
+        const tocToggle = document.getElementById("toc-toggle") as HTMLInputElement | null;
+        const toggleButtons = Array.from(document.querySelectorAll(".toc-fab, .toc-nav-toggle")) as HTMLElement[];
+        let lastFocusedBeforeOpen: HTMLElement | null = null;
+
+        function getFocusable(container: ParentNode): HTMLElement[] {
+          const selector = [
+            'a[href]:not([tabindex="-1"])',
+            'button:not([disabled]):not([tabindex="-1"])',
+            'input:not([disabled]):not([type="hidden"]):not([tabindex="-1"])',
+            'select:not([disabled]):not([tabindex="-1"])',
+            'textarea:not([disabled]):not([tabindex="-1"])',
+            '[tabindex]:not([tabindex="-1"])',
+          ].join(",");
+          return Array.from(container.querySelectorAll<HTMLElement>(selector));
+        }
+
+        const updateTocAria = () => {
+          const isOpen = !!tocToggle?.checked;
+          toggleButtons.forEach((btn) => btn.setAttribute("aria-expanded", String(isOpen)));
+          document.body.style.overflow = isOpen ? "hidden" : "";
+          // Global CSS sets symmetric gutter. No dynamic toggle needed here.
+
+          if (isOpen) {
+            lastFocusedBeforeOpen = (document.activeElement as HTMLElement) ?? null;
+            const focusables = getFocusable(tocEl);
+            const first = focusables[0];
+            if (first) first.focus();
+          } else {
+            if (lastFocusedBeforeOpen) lastFocusedBeforeOpen.focus();
+          }
+        };
+
+        tocToggle?.addEventListener("change", updateTocAria);
+
+        document.addEventListener("keydown", (e) => {
+          if (!tocToggle?.checked) return;
+          if (e.key !== "Tab") return;
+          const focusables = getFocusable(tocEl);
+          if (focusables.length === 0) return;
+          const first = focusables[0] as HTMLElement | undefined;
+          const last = focusables[focusables.length - 1] as HTMLElement | undefined;
+          const active = document.activeElement as HTMLElement | null;
+          if (e.shiftKey) {
+            if ((first && active === first) || !tocEl.contains(active)) {
+              e.preventDefault();
+              (last ?? tocEl).focus();
+            }
+          } else {
+            if ((last && active === last) || !tocEl.contains(active)) {
+              e.preventDefault();
+              (first ?? tocEl).focus();
+            }
+          }
+        });
+
+        tocEl.addEventListener("click", (ev) => {
+          const target = ev.target as HTMLElement | null;
+          if (!target) return;
+          if (target.matches('a[href^="#"]')) {
+            if (tocToggle) tocToggle.checked = false;
+            updateTocAria();
+          }
+        });
+
+        document.addEventListener("astro:after-swap", updateTocAria as EventListener);
+
+        // Swipe-down-to-close on mobile
+        let touchStartY = 0;
+        let touchStartX = 0;
+        const SWIPE_THRESHOLD_PX = 50;
+        const HORIZONTAL_TOLERANCE_PX = 60;
+        tocEl.addEventListener(
+          "touchstart",
+          (e: TouchEvent) => {
+            if (!e.changedTouches || e.changedTouches.length === 0) return;
+            const t = e.changedTouches.item(0);
+            if (!t) return;
+            touchStartY = t.clientY;
+            touchStartX = t.clientX;
+          },
+          { passive: true } as AddEventListenerOptions
+        );
+        tocEl.addEventListener(
+          "touchend",
+          (e: TouchEvent) => {
+            if (!tocToggle?.checked) return;
+            if (!e.changedTouches || e.changedTouches.length === 0) return;
+            const t = e.changedTouches.item(0);
+            if (!t) return;
+            const deltaY = t.clientY - touchStartY;
+            const deltaX = Math.abs(t.clientX - touchStartX);
+            if (deltaY > SWIPE_THRESHOLD_PX && deltaX < HORIZONTAL_TOLERANCE_PX) {
+              tocToggle.checked = false;
+              updateTocAria();
+            }
+          },
+          { passive: true } as AddEventListenerOptions
+        );
       }
     </script>
   </body>

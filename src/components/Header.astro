@@ -1,5 +1,6 @@
 ---
 import HeaderLink from "@/components/HeaderLink.astro";
+import { TableOfContents } from "@lucide/astro";
 
 // TODO: Consideration
 // https://developer.chrome.com/docs/css-ui/sticky-headers
@@ -34,6 +35,20 @@ const { currentTitle } = Astro.props as Props;
           </Fragment>
         )
       }
+      <li class="toc-nav-btn">
+        <label
+          for="toc-toggle"
+          class="toc-nav-toggle"
+          aria-controls="toc"
+          aria-expanded="false"
+          aria-haspopup="dialog"
+          aria-label="Open table of contents"
+          role="button"
+          tabindex="0">
+          <TableOfContents aria-hidden="true" />
+          <span class="sr-only">Contents</span>
+        </label>
+      </li>
     </ul>
   </nav>
 </header>
