@@ -27,7 +27,7 @@ const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueO
         {
           posts.map((post) => (
             <li>
-              <a href={`/echoes/${post.id}/`}>
+              <a href={`/echoes/${post.id}/`} data-astro-prefetch>
                 <span>
                   <FormattedDate date={post.data.pubDate} />
                 </span>
