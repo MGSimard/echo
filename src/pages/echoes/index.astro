@@ -2,7 +2,6 @@
 // import { Image } from 'astro:assets';
 import { getCollection } from "astro:content";
 import BaseHead from "@/components/BaseHead.astro";
-// import ScreenGlow from '@/components/ScreenGlow.astro';
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import FormattedDate from "@/components/FormattedDate.astro";
@@ -10,7 +9,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "@/consts";
 import Main from "@/components/Main.astro";
 
 const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-// TODO Find nice layout for hero image previews
 ---
 
 <!doctype html>
@@ -19,7 +17,6 @@ const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueO
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
   </head>
   <body>
-    <!-- <ScreenGlow /> -->
     <Header />
     <Main>
       <h1 class="sr-only">Echoes</h1>
